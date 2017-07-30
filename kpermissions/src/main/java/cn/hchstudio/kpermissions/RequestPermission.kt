@@ -2,13 +2,15 @@ package cn.hchstudio.kpermissions
 
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.os.Build
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
-import java.util.*
 
 /**
  * Created by ChanghuiN on 17-7-30.
+ *
+ * 1、dialog
  */
 class RequestPermission(var activity: Activity) {
 
@@ -18,63 +20,81 @@ class RequestPermission(var activity: Activity) {
     private var permissions: MutableMap<String, Permission> = mutableMapOf()
     private var unPermissions: MutableList<String> = mutableListOf()
 
-    lateinit var onRequestResult: Unit
+    private lateinit var onRequestResultCallback: (Boolean)->Unit
+    private lateinit var onRequestPermissionsCallback: (Permission) -> Unit
 
     fun requestPermission(perArr: Array<String>,
                           onRequestResult: (isAllow: Boolean) -> Unit,
                           onRequestPermissions: (permission: Permission) -> Unit = {}) {
+        /* To judge whether it's empty and SDK_VERSION */
+        if (perArr.size > 0 || Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            onRequestResult(true)
+            return
+        }
+
+        onRequestResultCallback = onRequestResult
+        onRequestPermissionsCallback = onRequestPermissions
+
         perArr.forEach { permissions.put(it, Permission(it, false, false)) }
 
         /* check permission */
-        checkPermission(onRequestPermissions)
+        checkPermission()
 
         /* shouldShowRequestPermissionRationale */
-        shouldShowRequestPermissionRationale(onRequestPermissions)
+        shouldShowRequestPermissionRationale()
 
         /* requestPermissions */
         if (unPermissions.size > 0)
             ActivityCompat.requestPermissions(activity, unPermissions.toTypedArray(), PERMISSIONS_REQUEST_CODE)
         else
-            onRequestResult(true)
-        this.onRequestResult = onRequestResult()
+            onRequestResultCallback(true)
     }
 
     /**
      * 回调调用此函数
      * @param requestCode
-     * @param permissions
+     * @param pers
      * @param grantResults
      */
-    fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    fun onRequestPermissionsResult(requestCode: Int, pers: Array<out String>, grantResults: IntArray) {
         if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults.size > 0) {
-            grantResults.forEach {
-                log("onRequestPermissionsResult---" + Arrays.toString(permissions) + "---" + Arrays.toString(grantResults))
-                if (it != PackageManager.PERMISSION_GRANTED) {
-                    permissionsResult.onRequestPermissionsResult(false)
-                    return
+
+            log("${grantResults.indices}---${grantResults.size}")
+
+            var result = true
+            for (index in grantResults.indices) {
+                log("onRequestPermissionsResult---" + pers.get(index) + "---" + grantResults.get(index))
+                var permission = permissions.get(pers.get(index))
+
+                permission?.let {
+                    permission.granted = grantResults.get(index) == PackageManager.PERMISSION_GRANTED
+                    onRequestPermissionsCallback(it)
+                    if (!permission.granted) result = false
                 }
+
             }
+            onRequestResultCallback(result)
         }
     }
 
-    private fun checkPermission(onRequestPermissions: (permission: Permission) -> Unit = {}) {
+    private fun checkPermission() {
         permissions.forEach {
             if (ContextCompat.checkSelfPermission(activity, it.key) != PackageManager.PERMISSION_GRANTED) {
                 unPermissions.add(it.key)
             } else {
                 log("checkPermission---HavePermission---${it.key}")
                 it.value.granted = true
-                onRequestPermissions(it.value)
+                onRequestPermissionsCallback(it.value)
             }
         }
     }
 
-    private fun shouldShowRequestPermissionRationale(onRequestPermissions: (permission: Permission) -> Unit = {}) {
+    private fun shouldShowRequestPermissionRationale() {
         unPermissions.forEach {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, it)) {
                 log("shouldShowRequestPermissionRationale---$it")
                 permissions.get(it)?.shouldShowRequestPermission = true
-                onRequestPermissions(permissions.get(it)!!)
+                onRequestPermissionsCallback(permissions.get(it)!!)
             }
         }
     }
