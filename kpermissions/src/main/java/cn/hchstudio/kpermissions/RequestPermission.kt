@@ -10,6 +10,18 @@ import android.util.Log
 /**
  * Created by ChanghuiN on 17-7-30.
  *
+ * Usage:
+ * 1. private var requsetPermission: RequestPermission = RequestPermission(this)
+ * 2. requsetPermission.requestPermission(arrayOf(Manifest.permission.CAMERA,
+ *       Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+ *       Manifest.permission.READ_PHONE_STATE), {
+ *       Log.i(TAG, "isAllow---$it")
+ *       }, {
+ *       Log.i(TAG, "permission---$it")
+ *       })
+ * 3. in onRequestPermissionsResult
+ *    requsetPermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
+ *
  */
 class RequestPermission(var activity: Activity) {
 
