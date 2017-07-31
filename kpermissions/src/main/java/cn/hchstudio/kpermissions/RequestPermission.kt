@@ -10,7 +10,6 @@ import android.util.Log
 /**
  * Created by ChanghuiN on 17-7-30.
  *
- * 1、dialog
  */
 class RequestPermission(var activity: Activity) {
 
@@ -27,7 +26,7 @@ class RequestPermission(var activity: Activity) {
                           onRequestResult: (isAllow: Boolean) -> Unit,
                           onRequestPermissions: (permission: Permission) -> Unit = {}) {
         /* To judge whether it's empty and SDK_VERSION */
-        if (perArr.size > 0 || Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (perArr.size <= 0 || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             onRequestResult(true)
             return
         }
@@ -59,8 +58,6 @@ class RequestPermission(var activity: Activity) {
     fun onRequestPermissionsResult(requestCode: Int, pers: Array<out String>, grantResults: IntArray) {
         if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults.size > 0) {
 
-            log("${grantResults.indices}---${grantResults.size}")
-
             var result = true
             for (index in grantResults.indices) {
                 log("onRequestPermissionsResult---" + pers.get(index) + "---" + grantResults.get(index))
@@ -71,7 +68,6 @@ class RequestPermission(var activity: Activity) {
                     onRequestPermissionsCallback(it)
                     if (!permission.granted) result = false
                 }
-
             }
             onRequestResultCallback(result)
         }
