@@ -1,9 +1,10 @@
-package cn.hchstudio.kpermissions
+package cn.hchstudio.example
 
 import android.Manifest
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import cn.hchstudio.kpermissions.RequestPermission
 
 class MainActivity : AppCompatActivity() {
 
