@@ -10,10 +10,10 @@ android {
     buildToolsVersion "25.0.3"
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 14
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0.1"
+        versionCode 2
+        versionName "1.0.4"
 
     }
     buildTypes {
@@ -30,8 +30,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:support-compat:25.4.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    api 'com.android.support:support-compat:25.4.0'
+    api "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
 repositories {
     mavenCentral()
@@ -41,7 +41,7 @@ def siteUrl = 'https://github.com/ChanghuiN/KPermissions'      //项目主页
 def gitUrl = 'https://github.com/ChanghuiN/KPermissions.git'   //项目的git地址
 
 group = "cn.hchstudio"
-version = "1.0.1"
+version = "1.0.4"
 // 这两个参数配置是为了最终生成 compile 'me.lfq:依赖库的名称:1.0.0'  group  version 是关键字，自动识别的。只需配置好就行。
 
 install {
