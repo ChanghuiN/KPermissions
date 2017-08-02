@@ -1,6 +1,6 @@
 # KPermissions
 
-This library allows the usage of kotlin with the new Android M permission model.
+This library allows the usage of Kotlin with the new Android M permission model.
 
 ## Setup
 
@@ -46,7 +46,7 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out
 }
 ```
 
-It can been use in Java
+It can been use in Java.  
 Look at the `sample` app for more.
 
 
