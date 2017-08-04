@@ -23,15 +23,13 @@ dependencies {
 Create a `KPermissions` instance :
 
 ```kotlin
-var requsetPermission: RequestPermission = RequestPermission(this); // where this is an Activity instance
+var requsetPermission: RequestPermission = RequestPermission(this) // where this is an Activity instance
 ```
 
-Example : request the CAMERA permission (with Retrolambda for brevity, but not required)
+Example : request the CAMERA permission
 
 ```kotlin
-requsetPermission.requestPermission(arrayOf(Manifest.permission.CAMERA,
-        Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.READ_PHONE_STATE), {
+requsetPermission.requestPermission(arrayOf(Manifest.permission.CAMERA), {
     Log.i(TAG, "isAllow---$it")
 }, {
     Log.i(TAG, "permission---$it")
