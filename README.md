@@ -47,4 +47,7 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out
 It can been use in Java.  
 Look at the `sample` app for more.
 
-
+## History
+### Version 1.0.8 (2017-08-05)
+1. add 'isDebug'
+2. Compatibility optimization
