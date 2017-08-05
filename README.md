@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile 'compile 'cn.hchstudio:kpermissions:1.0.6''
+    compile 'compile 'cn.hchstudio:kpermissions:1.0.8''
 }
 ```
 
@@ -23,13 +23,13 @@ dependencies {
 Create a `KPermissions` instance :
 
 ```kotlin
-var requsetPermission: RequestPermission = RequestPermission(this) // where this is an Activity instance
+var kPermission: KPermission = KPermission(this) // where this is an Activity instance
 ```
 
 Example : request the CAMERA permission
 
 ```kotlin
-requsetPermission.requestPermission(arrayOf(Manifest.permission.CAMERA), {
+kPermission.requestPermission(arrayOf(Manifest.permission.CAMERA), {
     Log.i(TAG, "isAllow---$it")
 }, {
     Log.i(TAG, "permission---$it")
@@ -39,7 +39,7 @@ requsetPermission.requestPermission(arrayOf(Manifest.permission.CAMERA), {
 You can need add callback in 'onRequestPermissionsResult' :
 ```kotlin
 override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-    requsetPermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    kPermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 }
 ```
