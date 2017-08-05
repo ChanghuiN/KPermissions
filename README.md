@@ -50,4 +50,5 @@ Look at the `sample` app for more.
 ## History
 ### Version 1.0.8 (2017-08-05)
 1. add 'isDebug'
-2. Compatibility optimization
+2. add API 'startPermissionSetting()'
+3. Compatibility optimization
