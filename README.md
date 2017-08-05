@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile 'compile 'cn.hchstudio:kpermissions:1.0.8''
+    compile 'cn.hchstudio:kpermissions:1.0.8'
 }
 ```
 
