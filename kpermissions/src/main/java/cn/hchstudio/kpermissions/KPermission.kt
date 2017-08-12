@@ -1,9 +1,13 @@
 package cn.hchstudio.kpermissions
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Fragment
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -26,10 +30,25 @@ import android.util.Log
  *    kPermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
  *
  */
-class KPermission(var activity: Activity) {
+class KPermission private constructor () { //(var activity: Activity) {
+
+    public constructor(activity: Activity) : this() {
+        this.context = activity
+        this.activity = activity
+    }
+
+    @SuppressLint("NewApi")
+    public constructor(fragment: Fragment) : this() {
+        this.context = fragment.activity
+        this.fragment = fragment
+    }
 
     private val TAG = "KPermission"
     private val PERMISSIONS_REQUEST_CODE = 42
+
+    private var context: Context? = null
+    private var activity: Activity? = null
+    private var fragment: Fragment? = null
 
     private var permissions: MutableMap<String, Permission> = mutableMapOf()
     private var unPermissions: MutableList<String> = mutableListOf()
@@ -46,11 +65,15 @@ class KPermission(var activity: Activity) {
     fun requestPermission(perArr: Array<String>,
                           onRequestResult: (isAllow: Boolean) -> Unit,
                           onRequestPermissions: (permission: Permission) -> Unit = {}) {
+        /* if activity android fragment is null, throw NullPointerException */
+        if (activity == null && fragment == null)
+            throw NullPointerException("activity and fragment is null")
         /* To judge whether it's empty and SDK_VERSION */
-//        if (perArr.size <= 0 || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-//            onRequestResult(true)
-//            return
-//        }
+        if (perArr.isEmpty()) {
+//                || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            onRequestResult(true)
+            return
+        }
 
         onRequestResultCallback = onRequestResult
         onRequestPermissionsCallback = onRequestPermissions
@@ -65,7 +88,13 @@ class KPermission(var activity: Activity) {
 
         /* requestPermissions */
         if (unPermissions.size > 0)
-            ActivityCompat.requestPermissions(activity, unPermissions.toTypedArray(), PERMISSIONS_REQUEST_CODE)
+            activity?.let {
+                ActivityCompat.requestPermissions(it, unPermissions.toTypedArray(), PERMISSIONS_REQUEST_CODE)
+            } ?: let {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    fragment?.requestPermissions(unPermissions.toTypedArray(), PERMISSIONS_REQUEST_CODE) ?:
+
+            }
         else
             onRequestResultCallback(true)
     }
@@ -94,25 +123,9 @@ class KPermission(var activity: Activity) {
         }
     }
 
-    /**
-     * 跳转到权限设置界面
-     */
-    fun startPermissionSetting() {
-        val intent = Intent()
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        intent.setData(Uri.fromParts("package", activity.getPackageName(), null))
-
-        try {
-            activity.startActivity(intent)
-        } catch(exception: Exception) {
-            log(exception.toString())
-        }
-    }
-
     private fun checkPermission() {
         permissions.forEach {
-            if (ContextCompat.checkSelfPermission(activity, it.key) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(context!!, it.key) != PackageManager.PERMISSION_GRANTED) {
                 unPermissions.add(it.key)
             } else {
                 log("checkPermission---HavePermission---${it.key}")
@@ -124,10 +137,30 @@ class KPermission(var activity: Activity) {
 
     private fun shouldShowRequestPermissionRationale() {
         unPermissions.forEach {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, it)) {
-                log("shouldShowRequestPermissionRationale---$it")
-                permissions.get(it)?.shouldShowRequestPermission = true
-                onRequestPermissionsCallback(permissions.get(it)!!)
+            activity?.let {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, it)) {
+                    log("shouldShowRequestPermissionRationale---$it")
+                    permissions.get(it)?.shouldShowRequestPermission = true
+                    onRequestPermissionsCallback(permissions.get(it)!!)
+                }
+            }
+        }
+    }
+
+    companion object {
+        /**
+         * 跳转到权限设置界面
+         */
+        fun startPermissionSetting(context: Context) {
+            val intent = Intent()
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.setData(Uri.fromParts("package", context.getPackageName(), null))
+
+            try {
+                context.startActivity(intent)
+            } catch(exception: Exception) {
+                throw exception
             }
         }
     }
