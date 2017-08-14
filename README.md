@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile 'cn.hchstudio:kpermissions:1.0.8'
+    compile 'cn.hchstudio:kpermissions:1.0.9'
 }
 ```
 
@@ -48,6 +48,9 @@ It can been use in Java.
 Look at the `sample` app for more.
 
 ## History
+### Version 1.0.9 (2017-08-14)
+1. add support in fragment
+
 ### Version 1.0.8 (2017-08-05)
 1. add 'isDebug'
 2. add API 'startPermissionSetting()'

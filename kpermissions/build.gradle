@@ -13,7 +13,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 8
-        versionName "1.0.8"
+        versionName "1.0.9"
 
     }
     buildTypes {
@@ -37,7 +37,7 @@ def siteUrl = 'https://github.com/ChanghuiN/KPermissions'      //项目主页
 def gitUrl = 'https://github.com/ChanghuiN/KPermissions.git'   //项目的git地址
 
 group = "cn.hchstudio"
-version = "1.0.8"
+version = "1.0.9"
 // 这两个参数配置是为了最终生成 compile 'me.lfq:依赖库的名称:1.0.0'  group  version 是关键字，自动识别的。只需配置好就行。
 
 install {

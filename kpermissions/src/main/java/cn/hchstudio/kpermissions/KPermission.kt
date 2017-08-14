@@ -30,16 +30,14 @@ import android.util.Log
  *    kPermission.onRequestPermissionsResult(requestCode, permissions, grantResults)
  *
  */
-class KPermission private constructor () { //(var activity: Activity) {
+class KPermission private constructor() { //(var activity: Activity) {
 
-    public constructor(activity: Activity) : this() {
-        this.context = activity
+    constructor(activity: Activity) : this() {
         this.activity = activity
     }
 
     @SuppressLint("NewApi")
-    public constructor(fragment: Fragment) : this() {
-        this.context = fragment.activity
+    constructor(fragment: Fragment) : this() {
         this.fragment = fragment
     }
 
@@ -53,7 +51,7 @@ class KPermission private constructor () { //(var activity: Activity) {
     private var permissions: MutableMap<String, Permission> = mutableMapOf()
     private var unPermissions: MutableList<String> = mutableListOf()
 
-    private lateinit var onRequestResultCallback: (Boolean)->Unit
+    private lateinit var onRequestResultCallback: (Boolean) -> Unit
     private lateinit var onRequestPermissionsCallback: (Permission) -> Unit
 
     /**
@@ -62,12 +60,14 @@ class KPermission private constructor () { //(var activity: Activity) {
      * @param onRequestResult 请求结果
      * @param onRequestPermissions 每个权限请求结果，可省略
      */
+    @SuppressLint("NewApi")
     fun requestPermission(perArr: Array<String>,
                           onRequestResult: (isAllow: Boolean) -> Unit,
                           onRequestPermissions: (permission: Permission) -> Unit = {}) {
         /* if activity android fragment is null, throw NullPointerException */
         if (activity == null && fragment == null)
             throw NullPointerException("activity and fragment is null")
+        context = activity?.let { activity } ?: fragment!!.context
         /* To judge whether it's empty and SDK_VERSION */
         if (perArr.isEmpty()) {
 //                || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -92,8 +92,7 @@ class KPermission private constructor () { //(var activity: Activity) {
                 ActivityCompat.requestPermissions(it, unPermissions.toTypedArray(), PERMISSIONS_REQUEST_CODE)
             } ?: let {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                    fragment?.requestPermissions(unPermissions.toTypedArray(), PERMISSIONS_REQUEST_CODE) ?:
-
+                    fragment?.requestPermissions(unPermissions.toTypedArray(), PERMISSIONS_REQUEST_CODE)
             }
         else
             onRequestResultCallback(true)
@@ -136,15 +135,23 @@ class KPermission private constructor () { //(var activity: Activity) {
     }
 
     private fun shouldShowRequestPermissionRationale() {
-        unPermissions.forEach {
-            activity?.let {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, it)) {
+        activity?.let {
+            unPermissions.forEach {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, it)) {
                     log("shouldShowRequestPermissionRationale---$it")
                     permissions.get(it)?.shouldShowRequestPermission = true
                     onRequestPermissionsCallback(permissions.get(it)!!)
                 }
             }
+        } ?: unPermissions.forEach {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                    fragment!!.shouldShowRequestPermissionRationale(it)) {
+                log("shouldShowRequestPermissionRationale---$it")
+                permissions.get(it)?.shouldShowRequestPermission = true
+                onRequestPermissionsCallback(permissions.get(it)!!)
+            }
         }
+
     }
 
     companion object {
