@@ -79,7 +79,7 @@ install {
     }
 }
 
-//上传到JCenter
+//上传到JCenter ./gradlew clean build bintrayUpload
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
